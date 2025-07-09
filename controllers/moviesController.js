@@ -85,7 +85,7 @@ class MoviesController {
             const result = await selectMovieWithActors({'title':req.body.title});
             return res.sendSuccess({key:'data', value:result});
         } catch (e) {
-            res.status(500).json({ error: 'Internal server error '+e.message });
+            res.status(409).json({ error: 'Validation error, probably movie with this title+year already exists' });
         }
     };
     async updateMovie(req, res){
