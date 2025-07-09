@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movies List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .controls label {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
+
+    input, select {
+      padding: 5px;
+      font-size: 14px;
+      width: 150px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #f4f4f4;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Movie List</h2>
+
+<div class="controls">
+  <label>
+    Sort by:
+    <select id="sort">
+      <option value="id">year</option>
+      <option value="title">title</option>
+      <option value="year">year</option>
+    </select>
+  </label>
+  <label>
+    Search:
+    <input id="search"/>
+
+  </label>
+  <label>
+    Order:
+    <select id="order">
+      <option value="ASC">ASC</option>
+      <option value="DESC" selected>DESC</option>
+    </select>
+  </label>
+
+  <label>
+    Limit:
+    <input type="number" id="limit" value="10" min="1">
+  </label>
+
+  <label>
+    Offset:
+    <input type="number" id="offset" value="0" min="0">
+  </label>
+
+  <div style="align-self: flex-end;">
+    <button id="searchBtn">Search</button>
+  </div>
+</div>
+
+<ul id="movieList"></ul>
+
+<script>
+  const movieList = document.getElementById('movieList');
+  const sortInput = document.getElementById('sort');
+  const orderInput = document.getElementById('order');
+  const limitInput = document.getElementById('limit');
+  const offsetInput = document.getElementById('offset');
+  const searchInput = document.getElementById('search');
+  const searchBtn = document.getElementById('searchBtn');
+
+  async function fetchMovies() {
+    const sort = sortInput.value;
+    const order = orderInput.value;
+    const limit = limitInput.value;
+    const offset = offsetInput.value;
+    const search = searchInput.value;
+    const query = new URLSearchParams({
+      sort,
+      order,
+      limit,
+      offset,
+      search
+    });
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`/api/v1/movies?${query.toString()}`,{
+        method: 'GET',
+        headers: {
+          'Authorization': `${token}`
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch movies');
+      const movies = await res.json();
+
+      renderMovies(movies.data);
+    } catch (error) {
+      movieList.innerHTML = `<li style="color:red;">${error.message}</li>`;
+    }
+  }
+
+  function renderMovies(movies) {
+    if (!Array.isArray(movies) || movies.length === 0) {
+      movieList.innerHTML = '<li>No movies found</li>';
+      return;
+    }
+
+    movieList.innerHTML = movies.map(movie => `
+  <li>
+    <strong>${movie.title}</strong> (${movie.year || 'N/A'})<br>
+    Format: ${movie.format || 'N/A'}<br>
+    Year: ${movie.year || 'N/A'}<br>
+    Actors: ${Array.isArray(movie.actors) && movie.actors.length > 0
+            ? movie.actors.map(actor => actor.name).join(', ')
+            : 'N/A'}
+  </li>
+`).join('');
+
+  }
+
+  searchBtn.addEventListener('click', fetchMovies);
+
+  // Initial load
+  fetchMovies();
+</script>
+
+</body>
+</html>

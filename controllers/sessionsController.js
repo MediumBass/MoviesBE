@@ -23,13 +23,14 @@ class UserController {
                 //destroys previous tokens and generates a new pair
             const { accessToken, refreshToken } = await generateTokenPair({ email });
             const prevToken=await Token.findOne({where: {user_email: email}})
-            await Token.destroy(prevToken)
-
-            await Token.create({ user_email: email, token: refreshToken });
-            await setCookie(res, 'refreshToken', refreshToken);
+            await Promise.all([
+                Token.destroy(prevToken),
+                Token.create({ user_email: email, token: refreshToken }),
+                setCookie(res, 'refreshToken', refreshToken)
+            ]);
             return res.sendSuccess({key:"token", value:accessToken});
         } catch (e) {
-            return res.status(500).json({ error: 'Internal error' });
+            return res.status(500).json({ error: 'Internal error ' +e.message });
         }
     }
 }

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Import Movies</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    #dropZone {
+      border: 2px dashed #aaa;
+      padding: 40px;
+      margin-top: 30px;
+      background-color: #f9f9f9;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    }
+    #dropZone.dragover {
+      background-color: #e0ffe0;
+    }
+    .hidden {
+      display: none;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+    #uploadBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+<h2>Import Movies</h2>
+<p>Drag and drop a <strong>.txt</strong> file below or select one manually:</p>
+
+<div id="dropZone">Drop your .txt file here</div>
+<input type="file" id="fileInput" accept=".txt" class="hidden" />
+<button id="uploadBtn">Choose File</button>
+
+<p id="message" class=""></p>
+<div id="loader" style="display: none; margin-top: 10px;">Uploading...</div>
+<script>
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const message = document.getElementById('message');
+
+  // Open file explorer on button click
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  // Handle file input selection
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      handleFileUpload(fileInput.files[0]);
+    }
+  });
+
+  // Handle drag events
+  dropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', function(e) {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  });
+
+  function handleFileUpload(file) {
+    const loader = document.getElementById('loader');
+    message.textContent = '';
+    message.className = '';
+
+    if (file.type !== 'text/plain') {
+      message.textContent = 'Only .txt files are allowed.';
+      message.className = 'error';
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.textContent = 'No token found. Please register or log in first.';
+      message.className = 'error';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('movies', file);
+
+    loader.style.display = 'block';
+
+    fetch('/api/v1/movies/import', {
+      method: 'POST',
+      headers: {
+        'Authorization': `${token}`
+      },
+      body: formData
+    })
+            .then(async (res) => {
+              if (!res.ok) {
+                const error = await res.text();
+                throw new Error(error || 'Upload failed.');
+              }
+              return res.text();
+            })
+            .then(responseText => {
+              message.textContent = 'File uploaded successfully!';
+              message.className = 'success';
+              window.location.href = '/List.html';
+            })
+            .catch(err => {
+              message.textContent = 'Error: ' + err.message;
+              message.className = 'error';
+            })
+            .finally(() => {
+              loader.style.display = 'none';
+            });
+  }
+
+</script>
+</body>
+</html>

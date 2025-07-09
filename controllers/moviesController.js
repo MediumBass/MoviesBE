@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const Movie = require("../database/models/movie");
 const Actor = require("../database/models/actor");
+const {Op} = require("@sequelize/core");
 
 
 async function selectMovieWithActors(obj) {
@@ -10,7 +11,6 @@ async function selectMovieWithActors(obj) {
         where: obj,
         include: {
             model: Actor,
-            as: 'actors',
             through: {attributes: []}, // hide join table
         },
     })
@@ -79,7 +79,7 @@ class MoviesController {
         }
         try {
             const result = await txtToJSON(req.file);
-            await Promise.all(result.map(createMovie));
+            await Promise.allSettled(result.map(createMovie));
             return res.sendSuccess({key:"data", value:result});
         } catch (e) {
             res.status(500).send('error'+e.message)
@@ -94,7 +94,7 @@ class MoviesController {
         try {
             await createMovie(req.body)
             const result = await selectMovieWithActors({"title":req.body.title});
-            return res.sendSuccess({key:"data", value:result});;
+            return res.sendSuccess({key:"data", value:result});
         } catch (e) {
             console.log(e)
             res.status(500).json({ error: 'Internal server error '+e.message });
@@ -161,22 +161,22 @@ class MoviesController {
 
             // options
             let where = {};
-            const actorWhere = {};
+            let actorWhere = {};
 
             if (search) {
-                if(await selectMovieWithActors({"title":search})){
-                    where.title = search
-                } else{
-                    actorWhere.name = search;
+                if(await selectMovieWithActors({title:{ [Op.like]: `%${search}%` }})){
+                    where = {title:{ [Op.like]: `%${search}%` }}
+                }else{
+                    actorWhere = {name:{ [Op.like]: `%${search}%` }};
                 }
             }
 
             if (title) {
-                where.title = title;
+                where = {title:{ [Op.like]: `%${title}%` }};
             }
 
             if (actor) {
-                actorWhere.name = actor;
+                actorWhere = {name:{ [Op.like]: `%${actor}%` }};
             }
 
             // runs query with filters and include
@@ -184,8 +184,7 @@ class MoviesController {
                 where,
                 include: {
                     model: Actor,
-                    as: 'actors',
-                    where: Object.keys(actorWhere).length ? actorWhere : undefined,
+                    where: actorWhere,
                     through: { attributes: [] }
                 },
                 order: [[sort, order]],
@@ -195,7 +194,6 @@ class MoviesController {
 
             return res.sendSuccess({key:"data", value:result});
         } catch (e) {
-            console.error('Search error:', e);
             res.status(500).json({ error: 'Internal server error ' +e.message });
         }
     }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin-bottom: 12px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<h2>Register</h2>
+<form id="registerForm">
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="text" id="name" placeholder="Name" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+    <button type="submit">Register</button>
+    <p class="error" id="errorMsg"></p>
+</form>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value.trim();
+        const name = document.getElementById('name').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorMsg = document.getElementById('errorMsg');
+
+        errorMsg.textContent = '';
+
+        if (password !== confirmPassword) {
+            errorMsg.textContent = "Passwords do not match.";
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/v1/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, name, password })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Registration failed.');
+            }
+
+            const data = await response.json();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                // Optional: redirect after successful registration
+                 window.location.href = '/import.html';
+            } else {
+                throw new Error('Token not found in response.');
+            }
+        } catch (error) {
+            errorMsg.textContent = error.message;
+        }
+    });
+</script>
+</body>
+</html>

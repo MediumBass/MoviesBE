@@ -1,4 +1,4 @@
-module.exports = function setCookie(res, cookieName, cookieValue) {
+module.exports =async function setCookie(res, cookieName, cookieValue) {
     res.cookie(cookieName, cookieValue, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

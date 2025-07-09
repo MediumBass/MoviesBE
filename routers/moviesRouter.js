@@ -4,7 +4,7 @@ const multer = require('multer')
 const upload = multer({dest: 'uploads/'})
 const moviesController = require('../controllers/moviesController')
 
-router.post('/import',upload.single("file"), moviesController.importMovies)
+router.post('/import',upload.single("movies"), moviesController.importMovies)
 router.post('/', moviesController.createNewMovie)
 router.get('/:id',moviesController.getOneMovie)
 router.patch('/:id',moviesController.updateMovie)

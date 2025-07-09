@@ -16,13 +16,13 @@ class UserController {
             const hash = await bcrypt.hash(password, salt);
             await User.create({ email,name, password: hash });
         } catch (e) {
-            console.log(e)
            return res.status(409).json({ error: 'Error creating new user: ' + e.message });
         }
         const { accessToken, refreshToken } = await generateTokenPair({ email });
-
-        await Token.create({ user_email: email, token: refreshToken });
-        await setCookie(res, 'refreshToken', refreshToken);
+        await Promise.all([
+            Token.create({ user_email: email, token: refreshToken }),
+            setCookie(res, 'refreshToken', refreshToken)
+        ]);
         return res.sendSuccess({key:"token", value:accessToken});
     }
 }
