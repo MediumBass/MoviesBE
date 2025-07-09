@@ -45,8 +45,8 @@ function txtToJSON(file) {
         fs.readFile(file.path, 'utf-8', (err, text) => {
             if (err) return reject(new Error('Failed to read uploaded file'));
 
-            fs.unlinkSync(file.path); // delete temp file
-
+            fs.unlinkSync(file.path); // delete a temp file
+            // this function split txt file to blocks by empty line, then each line converts to JSON
             const entries = text.trim().split(/\n\s*\n/);
             const movies = entries.map((block, index) => {
                 const lines = block.split('\n');
@@ -80,21 +80,21 @@ class MoviesController {
         try {
             const result = await txtToJSON(req.file);
             await Promise.all(result.map(createMovie));
-            res.sendSuccess(result)
+            return res.sendSuccess({key:"data", value:result});
         } catch (e) {
             res.status(500).send('error'+e.message)
         }
     }
     async getOneMovie(req, res) {
         const id = req.params.id;
-        const movie = await selectMovieWithActors({"id":id});
-        return res.status(200).json(movie);
+        const result = await selectMovieWithActors({"id":id});
+        return res.sendSuccess({key:"data", value:result});
     }
     async createNewMovie(req, res) {
         try {
             await createMovie(req.body)
             const result = await selectMovieWithActors({"title":req.body.title});
-            res.sendSuccess(result);
+            return res.sendSuccess({key:"data", value:result});;
         } catch (e) {
             console.log(e)
             res.status(500).json({ error: 'Internal server error '+e.message });
@@ -126,9 +126,8 @@ class MoviesController {
 
             await movie.setActors(actorInstances);
             const result = await selectMovieWithActors({"id":id});
-            res.sendSuccess(result);
+            return res.sendSuccess({key:"data", value:result});
         }catch (e){
-            console.log(e)
             res.status(500).json({ error: 'Internal server error ' +e.message });
         }
     }
@@ -160,7 +159,7 @@ class MoviesController {
                 offset = 0
             } = req.query;
 
-            // Construct search conditions
+            // options
             let where = {};
             const actorWhere = {};
 
@@ -180,8 +179,8 @@ class MoviesController {
                 actorWhere.name = actor;
             }
 
-            // Run query with filters and include
-            const movies = await Movie.findAll({
+            // runs query with filters and include
+            const result = await Movie.findAll({
                 where,
                 include: {
                     model: Actor,
@@ -194,7 +193,7 @@ class MoviesController {
                 offset: parseInt(offset)
             });
 
-            res.sendSuccess(movies);
+            return res.sendSuccess({key:"data", value:result});
         } catch (e) {
             console.error('Search error:', e);
             res.status(500).json({ error: 'Internal server error ' +e.message });
