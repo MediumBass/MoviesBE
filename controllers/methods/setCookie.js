@@ -5,4 +5,4 @@ module.exports =async function setCookie(res, cookieName, cookieValue) {
         sameSite: 'strict',
         maxAge: 15 * 24 * 60 * 60 * 1000
     });
-}
+};

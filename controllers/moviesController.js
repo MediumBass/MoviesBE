@@ -1,28 +1,20 @@
-const fs = require("node:fs");
-const Movie = require("../database/models/movie");
-const Actor = require("../database/models/actor");
-const {Op} = require("@sequelize/core");
+const fs = require('node:fs');
+const Movie = require('../database/models/movie');
+const Actor = require('../database/models/actor');
+const {Op} = require('@sequelize/core');
 
 
 async function selectMovieWithActors(obj) {
-    let movie
-    try{
-     movie = await Movie.findOne({
+    return await Movie.findOne({
         where: obj,
         include: {
             model: Actor,
             through: {attributes: []}, // hide join table
         },
-    })
-
-    }catch (e){
-        throw e
-    }
-    return movie;
+    });
 }
 
 async function createMovie(body) {
-    try{
         const { title, year, format, actors } = body;
         const movie = await Movie.create({ title, year, format });
 
@@ -34,16 +26,13 @@ async function createMovie(body) {
             }
             await movie.addActor(actor); //method created by sequelize
         }
-    }catch (e) {
-        throw e
-    }
 
 }
 
 function txtToJSON(file) {
     return new Promise((resolve, reject) => {
         fs.readFile(file.path, 'utf-8', (err, text) => {
-            if (err) return reject(new Error('Failed to read uploaded file'));
+            if (err) {return reject(new Error('Failed to read uploaded file'));}
 
             fs.unlinkSync(file.path); // delete a temp file
             // this function split txt file to blocks by empty line, then each line converts to JSON
@@ -80,23 +69,22 @@ class MoviesController {
         try {
             const result = await txtToJSON(req.file);
             await Promise.allSettled(result.map(createMovie));
-            return res.sendSuccess({key:"data", value:result});
+            return res.sendSuccess({key:'data', value:result});
         } catch (e) {
-            res.status(500).send('error'+e.message)
+            res.status(500).send('error'+e.message);
         }
     }
     async getOneMovie(req, res) {
         const id = req.params.id;
-        const result = await selectMovieWithActors({"id":id});
-        return res.sendSuccess({key:"data", value:result});
+        const result = await selectMovieWithActors({'id':id});
+        return res.sendSuccess({key:'data', value:result});
     }
     async createNewMovie(req, res) {
         try {
-            await createMovie(req.body)
-            const result = await selectMovieWithActors({"title":req.body.title});
-            return res.sendSuccess({key:"data", value:result});
+            await createMovie(req.body);
+            const result = await selectMovieWithActors({'title':req.body.title});
+            return res.sendSuccess({key:'data', value:result});
         } catch (e) {
-            console.log(e)
             res.status(500).json({ error: 'Internal server error '+e.message });
         }
     };
@@ -108,7 +96,7 @@ class MoviesController {
                 include: { model: Actor, as: 'actors' }
             });
             if(!movie){
-                return res.status(404).json({error: 'Movie not found '})
+                return res.status(404).json({error: 'Movie not found '});
             }
             await movie.update(
                 { title, year, format, actors },
@@ -125,8 +113,8 @@ class MoviesController {
             }
 
             await movie.setActors(actorInstances);
-            const result = await selectMovieWithActors({"id":id});
-            return res.sendSuccess({key:"data", value:result});
+            const result = await selectMovieWithActors({'id':id});
+            return res.sendSuccess({key:'data', value:result});
         }catch (e){
             res.status(500).json({ error: 'Internal server error ' +e.message });
         }
@@ -136,14 +124,13 @@ class MoviesController {
             const id = req.params.id;
             const movie =await Movie.findByPk(id);
             if(!movie){
-                return res.status(404).json({error: 'Movie not found '})
+                return res.status(404).json({error: 'Movie not found '});
             }
             await movie.destroy();
-            const result = await selectMovieWithActors({"id":id});
+            const result = await selectMovieWithActors({'id':id});
 
-            res.sendSuccess(result)
+            res.sendSuccess(result);
         }catch (e){
-            console.log(e)
             res.status(500).json({ error: 'Internal server error ' +e.message });
         }
     }
@@ -165,7 +152,7 @@ class MoviesController {
 
             if (search) {
                 if(await selectMovieWithActors({title:{ [Op.like]: `%${search}%` }})){
-                    where = {title:{ [Op.like]: `%${search}%` }}
+                    where = {title:{ [Op.like]: `%${search}%` }};
                 }else{
                     actorWhere = {name:{ [Op.like]: `%${search}%` }};
                 }
@@ -192,7 +179,7 @@ class MoviesController {
                 offset: parseInt(offset)
             });
 
-            return res.sendSuccess({key:"data", value:result});
+            return res.sendSuccess({key:'data', value:result});
         } catch (e) {
             res.status(500).json({ error: 'Internal server error ' +e.message });
         }
@@ -200,4 +187,4 @@ class MoviesController {
 
 }
 
-module.exports = new MoviesController()
+module.exports = new MoviesController();

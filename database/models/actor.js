@@ -1,5 +1,5 @@
-const {Model, DataTypes} = require("@sequelize/core");
-const sequelize = require('./index')
+const {Model, DataTypes} = require('@sequelize/core');
+const sequelize = require('./index');
 class Actor extends Model {}
 
 Actor.init(

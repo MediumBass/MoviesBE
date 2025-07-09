@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt');
-const User = require("../database/models/user");
-const Token = require("../database/models/token");
-const generateTokenPair = require("./methods/generateTokenPair");
-const setCookie = require("./methods/setCookie");
+const User = require('../database/models/user');
+const Token = require('../database/models/token');
+const generateTokenPair = require('./methods/generateTokenPair');
+const setCookie = require('./methods/setCookie');
 
-const saltRounds =  parseInt(process.env.SALT_ROUNDS,10)
+const saltRounds =  parseInt(process.env.SALT_ROUNDS,10);
 
 
 class UserController {
@@ -23,8 +23,8 @@ class UserController {
             Token.create({ user_email: email, token: refreshToken }),
             setCookie(res, 'refreshToken', refreshToken)
         ]);
-        return res.sendSuccess({key:"token", value:accessToken});
+        return res.sendSuccess({key:'token', value:accessToken});
     }
 }
 
-module.exports = new UserController()
+module.exports = new UserController();

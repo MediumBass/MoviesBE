@@ -1,6 +1,6 @@
-const {Model, DataTypes} = require("@sequelize/core");
-const sequelize = require('./index')
-const User = require("./user");
+const {Model, DataTypes} = require('@sequelize/core');
+const sequelize = require('./index');
+const User = require('./user');
 class Token extends Model {}
 
 Token.init(
