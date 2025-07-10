@@ -12,7 +12,9 @@ https://hub.docker.com/r/mediumbass/moviesbe
 2)Than run it with:
 
   docker run --name movies -p 8000:8050 -e APP_PORT=8050 mediumbass/moviesbe
+  
 OR to overwrite .env params
+
   docker run --name movies -p 8000:8050 -e APP_PORT=8050 -e SALT_ROUNDS=9 -e ACCESS_SECRET="secret" -e REFRESH_SECRET="refresh" mediumbass/moviesbe
   
 3)Go to:
