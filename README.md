@@ -36,9 +36,15 @@ https://documenter.getpostman.com/view/356840/TzkyLeVK#11fde7a2-c427-49d8-865b-4
 ## 🏗️ Project Architecture
 
 MoviesBE/
+
 ├── controllers/     # Logic for handling requests and responses 
+
 ├── database/        # Database configuration and models 
+
 ├── middlewares/     # Custom Express middlewares (e.g. authentication, responseWrapper)
+
 ├── public/          # Static HTML for web interface
+
 ├── routers/         # Route definitions that map URLs to controllers
+
 ├── uploads          # Temp dir for reading txt
