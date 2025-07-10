@@ -7,15 +7,15 @@ This is a simple Node.js Express backend for managing movies, packaged as a Dock
 1)Download the image directly from Docker Hub:
 https://hub.docker.com/r/mediumbass/moviesbe
 
-  docker pull mediumbass/moviesbe
+  **docker pull mediumbass/moviesbe**
 
 2)Than run it with:
 
-  docker run --name movies -p 8000:8050 -e APP_PORT=8050 mediumbass/moviesbe
+ **docker run --name movies -p 8000:8050 -e APP_PORT=8050 mediumbass/moviesbe**
   
 OR to overwrite .env params
 
-  docker run --name movies -p 8000:8050 -e APP_PORT=8050 -e SALT_ROUNDS=9 -e ACCESS_SECRET="secret" -e REFRESH_SECRET="refresh" mediumbass/moviesbe
+  **docker run --name movies -p 8000:8050 -e APP_PORT=8050 -e SALT_ROUNDS=9 -e ACCESS_SECRET="secret" -e REFRESH_SECRET="refresh" mediumbass/moviesbe**
   
 3)Go to:
 http://localhost:8000/
