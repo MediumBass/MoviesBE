@@ -19,13 +19,13 @@
 
 3) Go to:
 
-   ###  http://localhost:8000
+   http://localhost:8000
 
    Register, load .txt and viev list. Notice than web interface support only /users /movies/import and /movies/list endpoints
 
 4)  To fully test API go to:
 
-  ### https://documenter.getpostman.com/view/356840/TzkyLeVK#11fde7a2-c427-49d8-865b-444cb8e01c89
+   https://documenter.getpostman.com/view/356840/TzkyLeVK#11fde7a2-c427-49d8-865b-444cb8e01c89
 
   1. Press Run in Postman
   2. Set enviroment to movie
@@ -38,10 +38,17 @@
 ## 📁 Project Structure
 
 MoviesBE/
+
 │
+
 ├── controllers/         #### Route handler logic (e.g., movies, users)
+
 ├── database/            #### Database configuration and models
+
 ├── middlewares/         #### Custom Express middlewares (e.g., auth, error handling)
+
 ├── public/              #### Static HTML files served by Express 
+
 ├── routers/             #### Express route definitions and validation
+
 ├── uploads/             #### Dir for temp files uploading
