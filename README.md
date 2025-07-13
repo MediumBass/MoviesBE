@@ -27,12 +27,12 @@
 
    https://documenter.getpostman.com/view/356840/TzkyLeVK#11fde7a2-c427-49d8-865b-444cb8e01c89
 
-  1. Press Run in Postman
-  2. Set enviroment to movie
-  3. Run Users/create
-  4. Run Sessions/create
-  5. Make sure that {{token}} is set to last response
-  6. Run other endpoints
+  1) Press Run in Postman
+  2) Set enviroment to movie
+  3) Run Users/create
+  4) Run Sessions/create
+  5) Make sure that {{token}} is set to last response
+  6) Run other endpoints
 
 
 ## 📁 Project Structure
@@ -41,14 +41,14 @@ MoviesBE/
 
 │
 
-├── controllers/         #### Route handler logic (e.g., movies, users)
+├── controllers/         # Route handler logic (e.g., movies, users)
 
-├── database/            #### Database configuration and models
+├── database/            # Database configuration and models
 
-├── middlewares/         #### Custom Express middlewares (e.g., auth, error handling)
+├── middlewares/         # Custom Express middlewares (e.g., auth, error handling)
 
-├── public/              #### Static HTML files served by Express 
+├── public/              # Static HTML files served by Express 
 
-├── routers/             #### Express route definitions and validation
+├── routers/             # Express route definitions and validation
 
 ├── uploads/             #### Dir for temp files uploading
