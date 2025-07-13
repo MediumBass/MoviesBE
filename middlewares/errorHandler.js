@@ -1,4 +1,4 @@
-function errorHandler(err, req, res) {
+function errorHandler(err, req, res, next) {
     const value = err.value || 'Unknown error';
     const statusCode = err.statusCode || 500;
     res.status(statusCode).json({ errors: [ {'value':value,'msg':err.message}] });
